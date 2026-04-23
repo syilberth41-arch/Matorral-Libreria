@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if book else 'Nuevo' }} Libro — Admin{% endblock %}
+{% block content %}
+<h1 class="section-title">{{ '✏️ Editar Libro' if book else '📕 Nuevo Libro' }}</h1>
+
+<div class="card" style="max-width:700px;">
+    <div class="card-body">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="title">Título *</label>
+                <input type="text" id="title" name="title" class="form-control" value="{{ book.title if book else '' }}"
+                    required>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--space-md);">
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" id="isbn" name="isbn" class="form-control"
+                        value="{{ book.isbn if book and book.isbn else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="price">Precio *</label>
+                    <input type="number" id="price" name="price" class="form-control" step="0.01"
+                        value="{{ book.price if book else '' }}" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea id="description" name="description"
+                    class="form-control">{{ book.description if book and book.description else '' }}</textarea>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--space-md);">
+                <div class="form-group">
+                    <label for="genre_id">Género</label>
+                    <select id="genre_id" name="genre_id" class="form-control">
+                        <option value="">Sin género</option>
+                        {% for g in genres %}
+                        <option value="{{ g.id }}" {% if book and book.genre_id==g.id %}selected{% endif %}>{{ g.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="author_name">Autor</label>
+                    <input type="text" id="author_name" name="author_name" class="form-control"
+                        value="{{ book.author.name if book and book.author else '' }}" list="author_list">
+                    <datalist id="author_list">
+                        {% for a in authors %}<option value="{{ a.name }}">{% endfor %}
+                    </datalist>
+                </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--space-md);">
+                <div class="form-group">
+                    <label for="format">Formato *</label>
+                    <select id="format" name="format" class="form-control">
+                        <option value="physical" {% if book and book.format=='physical' %}selected{% endif %}>Físico
+                        </option>
+                        <option value="digital" {% if book and book.format=='digital' %}selected{% endif %}>Digital
+                        </option>
+                        <option value="both" {% if book and book.format=='both' %}selected{% endif %}>Ambos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" name="stock" class="form-control"
+                        value="{{ book.stock if book else 0 }}">
+                </div>
+                <div class="form-group">
+                    <label for="file_path">Archivo (e-book)</label>
+                    <input type="text" id="file_path" name="file_path" class="form-control"
+                        value="{{ book.file_path if book and book.file_path else '' }}" placeholder="libro.pdf">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">{{ 'Actualizar' if book else 'Crear' }} Libro</button>
+            <a href="{{ url_for('admin.book_list') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Matorral Librería - Tu librería digital de confianza. Compra libros físicos y digitales.">
+    <title>{% block title %}Matorral Librería{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('catalog.index') }}" class="nav-brand">
+                <span class="brand-icon" style="color: var(--primary); display:flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                    </svg>
+                </span>
+                Matorral Librería
+            </a>
+            <div class="nav-links">
+                <a href="{{ url_for('catalog.book_list') }}" class="nav-link">Catálogo</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('cart.view_cart') }}" class="nav-link nav-cart">
+                    🛒 Carrito
+                </a>
+                <a href="{{ url_for('auth.profile') }}" class="nav-link">{{ current_user.username }}</a>
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-link nav-admin">Admin</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="nav-link btn-outline-sm">Salir</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="nav-link">Iniciar Sesión</a>
+                <a href="{{ url_for('auth.register') }}" class="nav-link btn-primary-sm">Registrarse</a>
+                {% endif %}
+            </div>
+            <button class="nav-toggle" id="navToggle" aria-label="Menú">☰</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Matorral Librería. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile nav toggle
+        document.getElementById('navToggle')?.addEventListener('click', () => {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

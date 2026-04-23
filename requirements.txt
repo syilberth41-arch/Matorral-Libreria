@@ -1,0 +1,11 @@
+Flask==3.1.*
+Flask-SQLAlchemy==3.1.*
+Flask-Login==0.6.*
+Flask-Caching==2.3.*
+Flask-WTF==1.2.*
+Flask-Migrate==4.1.*
+pyotp==2.9.*
+qrcode[pil]==8.0
+Werkzeug==3.1.*
+pytest==8.3.*
+pytest-cov==6.0.*

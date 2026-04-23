@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Checkout — BookStore{% endblock %}
+{% block content %}
+<h1 class="section-title">💳 Realizar Pago</h1>
+
+<!-- Checkout Steps -->
+<div class="checkout-steps">
+    <div class="step"><span class="step-number">1</span> Revisar</div>
+    <div class="step active"><span class="step-number">2</span> Pago</div>
+    <div class="step"><span class="step-number">3</span> Confirmación</div>
+</div>
+
+<div style="display:grid; grid-template-columns:1.5fr 1fr; gap:var(--space-2xl);">
+    <!-- Payment form -->
+    <div class="card">
+        <div class="card-body">
+            <h2 style="margin-bottom:var(--space-lg);">Datos de pago y envío</h2>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="card_number">Número de tarjeta</label>
+                    <input type="text" id="card_number" name="card_number" class="form-control"
+                        placeholder="1234 5678 9012 3456" required maxlength="19" autocomplete="cc-number">
+                    <small style="color:var(--text-muted); font-size:0.75rem;">🔒 Datos tokenizados — no almacenamos tu
+                        tarjeta (PCI DSS)</small>
+                </div>
+                <div class="form-group">
+                    <label for="shipping_address">Dirección de envío</label>
+                    <textarea id="shipping_address" name="shipping_address" class="form-control" rows="3"
+                        placeholder="Calle, Ciudad, País, Código postal" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Confirmar y pagar ${{ "%.2f"|format(total)
+                    }}</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order summary -->
+    <div class="card">
+        <div class="card-body">
+            <h2 style="margin-bottom:var(--space-lg);">Resumen</h2>
+            {% for item in items %}
+            <div
+                style="display:flex; justify-content:space-between; margin-bottom:var(--space-md); padding-bottom:var(--space-sm); border-bottom:1px solid var(--border-color);">
+                <div>
+                    <div style="font-weight:500;">{{ item.book.title }}</div>
+                    <div style="color:var(--text-muted); font-size:0.85rem;">x{{ item.quantity }}</div>
+                </div>
+                <div style="font-weight:600;">${{ "%.2f"|format(item.subtotal) }}</div>
+            </div>
+            {% endfor %}
+            <div
+                style="display:flex; justify-content:space-between; padding-top:var(--space-md); font-size:1.2rem; font-weight:700;">
+                <span>Total</span>
+                <span style="color:var(--secondary);">${{ "%.2f"|format(total) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

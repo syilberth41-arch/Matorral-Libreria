@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Pedido #{{ order.id }} — Admin{% endblock %}
+{% block content %}
+<h1 class="section-title">Pedido #{{ order.id }}</h1>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--space-xl); margin-bottom:var(--space-xl);">
+    <div class="card">
+        <div class="card-body">
+            <h3 style="margin-bottom:var(--space-md);">Información</h3>
+            <div class="profile-field"><span class="profile-label">Cliente</span>
+                <div class="profile-value">{{ order.user.username }} ({{ order.user.email }})</div>
+            </div>
+            <div class="profile-field"><span class="profile-label">Fecha</span>
+                <div class="profile-value">{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+            </div>
+            <div class="profile-field"><span class="profile-label">Estado</span>
+                <div class="profile-value"><span class="badge badge-{{ order.status }}">{{ order.status_es }}</span>
+                </div>
+            </div>
+            <div class="profile-field"><span class="profile-label">Total</span>
+                <div class="profile-value" style="color:var(--secondary); font-weight:700;">${{
+                    "%.2f"|format(order.total) }}</div>
+            </div>
+            {% if order.shipping_address %}<div class="profile-field"><span class="profile-label">Dirección</span>
+                <div class="profile-value">{{ order.shipping_address }}</div>
+            </div>{% endif %}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h3 style="margin-bottom:var(--space-md);">Cambiar estado</h3>
+            <form method="POST" action="{{ url_for('admin.order_update_status', order_id=order.id) }}"
+                style="display:flex; gap:var(--space-md);">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <select name="status" class="form-control">
+                    {% set smap = {'pending':'Pendiente', 'paid':'Pagado', 'shipped':'Enviado', 'delivered':'Entregado',
+                    'cancelled':'Cancelado'} %}
+                    {% for s in ['pending','paid','shipped','delivered','cancelled'] %}
+                    <option value="{{ s }}" {% if order.status==s %}selected{% endif %}>{{ smap[s] }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Actualizar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<h2 class="section-title">Artículos</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Libro</th>
+            <th>Cantidad</th>
+            <th>Precio unit.</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order.items %}
+        <tr>
+            <td>{{ item.book.title }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ "%.2f"|format(item.unit_price) }}</td>
+            <td>${{ "%.2f"|format(item.subtotal) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

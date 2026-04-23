@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil — Matorral Librería{% endblock %}
+{% block content %}
+<div class="profile-card card">
+    <div class="card-body">
+        <h1 class="section-title">Mi Perfil</h1>
+        <div class="profile-field">
+            <div class="profile-label">Usuario</div>
+            <div class="profile-value">{{ current_user.username }}</div>
+        </div>
+        <div class="profile-field">
+            <div class="profile-label">Email</div>
+            <div class="profile-value">{{ current_user.email }}</div>
+        </div>
+        <div class="profile-field">
+            <div class="profile-label">Miembro desde</div>
+            <div class="profile-value">{{ current_user.created_at.strftime('%d/%m/%Y') }}</div>
+        </div>
+        <div class="profile-field">
+            <div class="profile-label">Autenticación 2FA</div>
+            <div class="profile-value">
+                {% if current_user.mfa_enabled %}
+                <span class="badge badge-paid">Activada</span>
+                {% else %}
+                <span class="badge badge-pending">Desactivada</span>
+                <a href="{{ url_for('auth.setup_2fa') }}" class="btn btn-primary btn-sm"
+                    style="margin-left:var(--space-sm);">Activar</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h2 class="section-title">Mis Pedidos y Biblioteca</h2>
+        {% if orders %}
+        {% for order in orders %}
+        <div class="order-card"
+            style="border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-lg);">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-sm); margin-bottom: var(--space-md);">
+                <div>
+                    <strong>Pedido #{{ order.id }}</strong><br>
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">{{ order.created_at.strftime('%d/%m/%Y
+                        %H:%M') }}</span>
+                </div>
+                <div style="text-align: right;">
+                    <span class="badge badge-{{ order.status }}">{{ order.status_es }}</span><br>
+                    <strong>${{ "%.2f"|format(order.total) }}</strong>
+                </div>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; margin-top: var(--space-md); font-size: 0.95rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color);">
+                        <th style="text-align: left; padding: var(--space-sm);">Libro</th>
+                        <th style="text-align: left; padding: var(--space-sm);">Formato</th>
+                        <th style="text-align: right; padding: var(--space-sm);">Precio</th>
+                        <th style="text-align: right; padding: var(--space-sm);">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: var(--space-sm); font-weight: 500;">{{ item.book.title }}</td>
+                        <td style="padding: var(--space-sm); color: var(--text-muted);">{{ item.book.format|capitalize
+                            }}</td>
+                        <td style="padding: var(--space-sm); text-align: right;">${{ "%.2f"|format(item.unit_price) }}
+                            <span style="font-size:0.8rem; color:var(--text-muted);">x{{ item.quantity }}</span>
+                        </td>
+                        <td style="padding: var(--space-sm); text-align: right;">
+                            {% if order.status == 'paid' and item.book.is_digital %}
+                            <a href="{{ url_for('download.download_book', book_id=item.book.id) }}"
+                                class="btn btn-primary btn-sm"
+                                style="display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; padding: 6px 12px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Descargar
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color: var(--text-muted); text-align: center; padding: var(--space-xl) 0;">Aún no has realizado
+            ninguna compra.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

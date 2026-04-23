@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}¡Compra Exitosa! — BookStore{% endblock %}
+{% block content %}
+<!-- Checkout Steps -->
+<div class="checkout-steps">
+    <div class="step"><span class="step-number">1</span> Revisar</div>
+    <div class="step"><span class="step-number">2</span> Pago</div>
+    <div class="step active"><span class="step-number">3</span> Confirmación</div>
+</div>
+
+<div class="confirmation-box">
+    <div class="confirmation-icon">✅</div>
+    <h1>¡Compra Exitosa!</h1>
+    <p style="color:var(--text-secondary); margin-bottom:var(--space-xl);">
+        Tu pedido <strong>#{{ order.id }}</strong> ha sido procesado correctamente.<br>
+        Total: <strong style="color:var(--secondary);">${{ "%.2f"|format(order.total) }}</strong>
+    </p>
+
+    {% set digital_items = order.items | selectattr('book.is_digital') | list %}
+    {% if digital_items %}
+    <div class="card" style="max-width:500px; margin:0 auto var(--space-xl);">
+        <div class="card-body">
+            <h3 style="margin-bottom:var(--space-md);">📥 Tus libros digitales</h3>
+            {% for item in digital_items %}
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-sm);">
+                <span>{{ item.book.title }}</span>
+                <a href="{{ url_for('download.download_book', book_id=item.book_id) }}"
+                    class="btn btn-secondary btn-sm">Descargar</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('catalog.index') }}" class="btn btn-primary">Seguir comprando</a>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Catálogo — Matorral Librería{% endblock %}
+{% block content %}
+<h1 class="section-title">Catálogo de Libros</h1>
+
+<!-- Advanced Search Filters -->
+<form method="GET" class="filters-bar">
+    <div class="filter-group" style="flex:2;">
+        <label for="q">Buscar por título</label>
+        <input type="text" id="q" name="q" class="form-control" value="{{ filters.q or '' }}" placeholder="Buscar...">
+    </div>
+    <div class="filter-group">
+        <label for="genre">Género</label>
+        <select id="genre" name="genre" class="form-control">
+            <option value="">Todos</option>
+            {% for g in genres %}
+            <option value="{{ g.id }}" {% if filters.genre==g.id %}selected{% endif %}>{{ g.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-group">
+        <label for="author">Autor</label>
+        <input type="text" id="author" name="author" class="form-control" value="{{ filters.author or '' }}"
+            placeholder="Nombre">
+    </div>
+    <div class="filter-group" style="min-width:100px;">
+        <label for="price_min">Precio mín</label>
+        <input type="number" id="price_min" name="price_min" class="form-control" step="0.01"
+            value="{{ filters.price_min or '' }}">
+    </div>
+    <div class="filter-group" style="min-width:100px;">
+        <label for="price_max">Precio máx</label>
+        <input type="number" id="price_max" name="price_max" class="form-control" step="0.01"
+            value="{{ filters.price_max or '' }}">
+    </div>
+    <div class="filter-group" style="flex:0;">
+        <label>&nbsp;</label>
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>
+
+{% if books %}
+<div class="book-grid">
+    {% for book in books %}
+    <a href="{{ url_for('catalog.book_detail', book_id=book.id) }}" class="card book-card"
+        style="text-decoration:none; color:inherit;">
+        <div class="book-cover" style="padding: 0; overflow: hidden;">
+            {% if book.cover_url %}
+            <img src="{{ book.cover_url }}" alt="Portada de {{ book.title }}"
+                style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+            <img src="https://picsum.photos/seed/c_{{ book.id }}/300/400" alt="Portada de {{ book.title }}"
+                style="width: 100%; height: 100%; object-fit: cover;">
+            {% endif %}
+        </div>
+        <div class="book-info">
+            <div class="book-title">{{ book.title }}</div>
+            <div class="book-author">{{ book.author.name if book.author else 'Autor desconocido' }}</div>
+            <span class="book-format format-{{ book.format }}">{{ book.format }}</span>
+            <div class="book-price">${{ "%.2f"|format(book.price) }}</div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if pagination.pages > 1 %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a
+        href="?page={{ pagination.prev_num }}&q={{ filters.q or '' }}&genre={{ filters.genre or '' }}&author={{ filters.author or '' }}&price_min={{ filters.price_min or '' }}&price_max={{ filters.price_max or '' }}">←
+        Anterior</a>
+    {% endif %}
+    {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+    {% if page_num %}
+    {% if page_num == pagination.page %}
+    <span class="active-page">{{ page_num }}</span>
+    {% else %}
+    <a
+        href="?page={{ page_num }}&q={{ filters.q or '' }}&genre={{ filters.genre or '' }}&author={{ filters.author or '' }}&price_min={{ filters.price_min or '' }}&price_max={{ filters.price_max or '' }}">{{
+        page_num }}</a>
+    {% endif %}
+    {% else %}
+    <span>…</span>
+    {% endif %}
+    {% endfor %}
+    {% if pagination.has_next %}
+    <a
+        href="?page={{ pagination.next_num }}&q={{ filters.q or '' }}&genre={{ filters.genre or '' }}&author={{ filters.author or '' }}&price_min={{ filters.price_min or '' }}&price_max={{ filters.price_max or '' }}">Siguiente
+        →</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div style="text-align:center; padding:var(--space-3xl); color:var(--text-muted);">
+    <p style="font-size:3rem; margin-bottom:var(--space-md);">📭</p>
+    <p>No se encontraron libros con esos filtros.</p>
+</div>
+{% endif %}
+{% endblock %}

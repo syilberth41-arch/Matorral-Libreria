@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Pedidos — Admin{% endblock %}
+{% block content %}
+<h1 class="section-title">📦 Gestión de Pedidos</h1>
+
+<div style="margin-bottom:var(--space-lg); display:flex; gap:var(--space-sm);">
+    <a href="{{ url_for('admin.order_list') }}"
+        class="btn btn-sm {% if not current_status %}btn-primary{% else %}btn-secondary{% endif %}">Todos</a>
+    {% set smap = {'pending':'Pendiente', 'paid':'Pagado', 'shipped':'Enviado', 'delivered':'Entregado',
+    'cancelled':'Cancelado'} %}
+    {% for s in ['pending','paid','shipped','delivered','cancelled'] %}
+    <a href="{{ url_for('admin.order_list', status=s) }}"
+        class="btn btn-sm {% if current_status == s %}btn-primary{% else %}btn-secondary{% endif %}">{{ smap[s] }}</a>
+    {% endfor %}
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in pagination.items %}
+        <tr>
+            <td>#{{ order.id }}</td>
+            <td>{{ order.user.username }}</td>
+            <td>${{ "%.2f"|format(order.total) }}</td>
+            <td><span class="badge badge-{{ order.status }}">{{ order.status_es }}</span></td>
+            <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td><a href="{{ url_for('admin.order_detail', order_id=order.id) }}"
+                    class="btn btn-secondary btn-sm">Ver</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Géneros — Admin{% endblock %}
+{% block content %}
+<h1 class="section-title">🏷️ Gestión de Géneros</h1>
+
+<div class="card" style="max-width:500px; margin-bottom:var(--space-xl);">
+    <div class="card-body">
+        <form method="POST" style="display:flex; gap:var(--space-md);">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="text" name="name" class="form-control" placeholder="Nuevo género" required>
+            <button type="submit" class="btn btn-primary">Agregar</button>
+        </form>
+    </div>
+</div>
+
+<table class="data-table" style="max-width:500px;">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Libros</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for genre in genres %}
+        <tr>
+            <td>{{ genre.name }}</td>
+            <td>{{ genre.books.count() }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('admin.genre_delete', genre_id=genre.id) }}"
+                    style="display:inline;" onsubmit="return confirm('¿Eliminar?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

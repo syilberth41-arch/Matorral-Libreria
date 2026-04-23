@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Admin — BookStore{% endblock %}
+{% block content %}
+<h1 class="section-title">📊 Panel de Administración</h1>
+
+<div class="admin-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_books }}</div>
+        <div class="stat-label">Libros</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_orders }}</div>
+        <div class="stat-label">Pedidos</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_genres }}</div>
+        <div class="stat-label">Géneros</div>
+    </div>
+</div>
+
+<div style="display:flex; gap:var(--space-md); margin-bottom:var(--space-xl);">
+    <a href="{{ url_for('admin.book_list') }}" class="btn btn-secondary">📚 Gestionar libros</a>
+    <a href="{{ url_for('admin.genre_list') }}" class="btn btn-secondary">🏷️ Gestionar géneros</a>
+    <a href="{{ url_for('admin.order_list') }}" class="btn btn-secondary">📦 Gestionar pedidos</a>
+    <a href="{{ url_for('admin.book_create') }}" class="btn btn-primary">+ Nuevo libro</a>
+</div>
+
+<h2 class="section-title">Pedidos Recientes</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in recent_orders %}
+        <tr>
+            <td><a href="{{ url_for('admin.order_detail', order_id=order.id) }}">#{{ order.id }}</a></td>
+            <td>{{ order.user.username }}</td>
+            <td>${{ "%.2f"|format(order.total) }}</td>
+            <td><span class="badge badge-{{ order.status }}">{{ order.status_es }}</span></td>
+            <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
